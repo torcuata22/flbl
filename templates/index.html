@@ -1,25 +1,31 @@
-<h1>Hello Valhalla!</h1>
+{% extends "base.html" %}
+{% block content %}
 
-<p>This is not my first Flask webpage</p>
-<p>But I hope it'll be the one I finish</p>
-<p>My name is {{first_name}}</p>
-<p>{{stuff |safe}} created with the safe filter</p>
-{{stuff |striptags}} stripped of html with striptags filter for security reasons</p>
-<p>{{stuff |title}} created with title filter</p>
-<p>{{stuff |trim}} removed trailing spaces with trim filter</p>
+    {% block title %}<h1 class="float-right p-10">Hello Valhalla!</h1> {% endblock %}
 
-My favorite pizzas are:
-{% for p in favorite_pizza %}
-    {% if p == 32 %}
-        {{ p + 10 }}
-    {% else %}
-        <ul>
-            <li>{{ p }}</li>
-        </ul>
-    {% endif %}
-    
-{% endfor %}
+    <p>This is not my first Flask webpage</p>
+    <p>But I hope it'll be the one I finish</p>
+    <p>My name is {{first_name}}</p>
+    <p>{{stuff |safe}} created with the safe filter</p>
+    {{stuff |striptags}} stripped of html with striptags filter for security reasons</p>
+    <p>{{stuff |title}} created with title filter</p>
+    <p>{{stuff |trim}} removed trailing spaces with trim filter</p>
 
-<br><br>
+    My favorite pizzas are:
+    {% for p in favorite_pizza %}
+        {% if p == 32 %}
+            {{ p + 10 }}
+        {% else %}
+            <ul>
+                <li>{{ p }}</li>
+            </ul>
+        {% endif %}
+        
+    {% endfor %}
 
-{{favorite_pizza.1 |reverse}}
+    <br><br>
+
+    {{favorite_pizza.1 |reverse}}
+    <br>
+
+{% endblock %}
