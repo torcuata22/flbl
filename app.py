@@ -1,9 +1,10 @@
-from flask import Flask, render_template, flash #flash messages on the screen
+from flask import Flask, render_template, flash, request #flash messages on the screen
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_migrate import Migrate
 
 
 #create flask instance:
@@ -17,12 +18,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:pa55w0rd123@localh
 #Create secret key:
 app.config['SECRET_KEY']="m45u93r53cr37llav3"
 db = SQLAlchemy(app)
+migrate = Migrate(app,db)
+
 
 #Create a model:
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True) #only one person per email address
+    favorite_color = db.Column(db.String(120))
     data_added = db.Column(db.DateTime, default=datetime.utcnow)
 
 #create a string:
@@ -36,6 +40,7 @@ with app.app_context():
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
+    favorite_color=StringField("Favorite color")
     submit = SubmitField("Submit")
     
 @app.route('/user_add/', methods=['GET','POST'])
@@ -45,12 +50,13 @@ def add_user():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None:
-            user = User(name=form.name.data, email=form.email.data)
+            user = User(name=form.name.data, email=form.email.data, favorite_color=form.favorite_color.data)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = '' #clears the form
         form.email.data = '' #clears the form
+        form.favorite_color.data = ''
         flash("User Added Successfully!")
     our_users = User.query.order_by(User.data_added)
     return render_template("add_user.html", form=form, name=name, our_users=our_users)
@@ -102,6 +108,33 @@ def name():
 
     return render_template('name.html',name=name,form=form)
 
+#Update DB record:
+@app.route('/update/<int:id>', methods=['GET','POST'])
+def update(id):
+    form = UserForm()
+    name_to_update = User.query.get_or_404(id)
+    if request.method == 'POST':
+        name_to_update.name = request.form['name']
+        name_to_update.email = request.form['email']
+        name_to_update.favorite_color = request.form['favorite_color']
+
+        try:
+            db.session.commit()
+            flash("User updated successfully")
+            return render_template("update.html", 
+                                   form=form,
+                                   name_to_update=name_to_update)
+        except:
+            flash("Update failed, please try again")
+            return render_template("update.html", 
+                                   form=form,
+                                   name_to_update=name_to_update)
+    else:
+        return render_template("update.html", 
+                                   form=form,
+                                   name_to_update=name_to_update)
+
+
 
 
 
@@ -115,3 +148,10 @@ def name():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+#to set up migrations:
+#pip install Flask-Migrate
+#make imports
+#run: flask db init to create the directory that will hold the migrations (had to change name to app.py)
+#first migration: flask db migrate -m "first migration", THEN flask db upgrade
