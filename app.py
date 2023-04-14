@@ -134,7 +134,24 @@ def update(id):
                                    form=form,
                                    name_to_update=name_to_update)
 
+#Delete Function:
+@app.route('/delete/<int:id>')
+def delete(id):
+    user_to_delete = User.query.get_or_404(id)
+    name=None
+    form = UserForm()
 
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        flash("User has been successfully deleted")
+
+        our_users = User.query.order_by(User.data_added)
+        return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
+    except:
+        flash("Oops! Something went wrong. Please try again!")
+        return render_template("add_user.html", form=form, name=name, our_users=our_users)
 
 
 
