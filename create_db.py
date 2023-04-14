@@ -13,8 +13,11 @@ mydb=mysql.connector.connect(
 )
 
 my_cursor=mydb.cursor()
-my_cursor.execute("CREATE DATABASE our_users")
+#my_cursor.execute("CREATE DATABASE our_users") -->just in case
 
 my_cursor.execute("SHOW DATABASES")
 for db in my_cursor:
     print(db)
+
+#will need to pip install pymysql to create db (MySQLdb module not found)
+#pip install cryptography
