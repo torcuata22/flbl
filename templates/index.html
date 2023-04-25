@@ -1,3 +1,16 @@
-<h1>Hello World</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<p>This is my second try at finishing this stupid tutorial...</p>
+<h1>Hello Valhalla!</h1>
+
+<p>My name is {{first_name}}</p>
+<p>My hobbies are playing with</p>
+{% for toy in favorite_toys %}
+{{toy}} <br>
+{% endfor %}
+<br>
+And {{favorite_toys.0}} Did I mention {{favorite_toys.0}}? I wuv my {{favorite_toys.0}}...
+<br>
+And I love to eat {{ favorite_food }}, too, and when I don't get my way, I {{favorite_sound | upper}}!
+
+{% endblock %}
